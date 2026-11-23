@@ -1,0 +1,8 @@
+services:
+  decoupe-papier:
+    build: .
+    image: decoupe-papier:latest
+    container_name: decoupe-papier
+    ports:
+      - "8090:80"
+    restart: unless-stopped
