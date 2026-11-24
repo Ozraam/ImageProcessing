@@ -17,6 +17,7 @@ import { useToolSettings } from '@/composables/useToolSettings'
 import { baseName, canvasToBlob } from '@/lib/image'
 import { useImageStore } from '@/stores/image'
 import tool from './tool'
+import './decoupe.css'
 import { applyCrop, cropPx, defaultParams, fitRatio, sampleFlower, type Crop, type DecoupeParams } from './render'
 import { DecoupeRenderer, type PreviewResult } from './renderer'
 
@@ -383,43 +384,3 @@ const pct = (v: number) => `${String(v).replace('.', ',')} %`
     </template>
   </ToolLayout>
 </template>
-
-<style>
-/* Motif propre à cet outil : le tapis de coupe vert, avec ses règles graduées */
-.decoupe-mat {
-  --mat: #1f5b44;
-  --mat-line: rgba(255, 255, 255, 0.1);
-  --mat-mark: rgba(255, 255, 255, 0.35);
-  background-color: var(--mat);
-  background-image:
-    linear-gradient(var(--mat-line) 1px, transparent 1px),
-    linear-gradient(90deg, var(--mat-line) 1px, transparent 1px);
-  background-size: 24px 24px;
-  background-position: 27px 27px;
-}
-.dark .decoupe-mat {
-  --mat: #173f30;
-  --mat-line: rgba(255, 255, 255, 0.07);
-  --mat-mark: rgba(255, 255, 255, 0.28);
-}
-.decoupe-mat.relative::before,
-.decoupe-mat.relative::after {
-  content: "";
-  position: absolute;
-  pointer-events: none;
-}
-.decoupe-mat.relative::before {
-  left: 0; right: 0; top: 0; height: 18px;
-  background-image: linear-gradient(90deg, var(--mat-mark) 1px, transparent 1px);
-  background-size: 24px 8px;
-  background-repeat: repeat-x;
-  background-position: 27px 0;
-}
-.decoupe-mat.relative::after {
-  top: 0; bottom: 0; left: 0; width: 18px;
-  background-image: linear-gradient(var(--mat-mark) 1px, transparent 1px);
-  background-size: 8px 24px;
-  background-repeat: repeat-y;
-  background-position: 0 27px;
-}
-</style>
