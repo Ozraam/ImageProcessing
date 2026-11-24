@@ -1,7 +1,6 @@
 # Plan — Migration vers Vue 3 + shadcn-vue
 
-> Statut : **proposition à valider**. Rien n'est encore migré ; ce document et les mockups
-> servent à décider avant d'écrire le code.
+> Statut : **validé et mis en œuvre** (étapes 1 à 6). Reste la phase 2 (§6, étape 7).
 > Mockups modifiables : https://claude.ai/artifact/VAv4o6VWThBVj5KmiWw2m3
 
 ## 1. Objectifs
@@ -138,9 +137,12 @@ actions: setSource(file), useResultAsSource(entry), clear()
 6. **Docker** : Dockerfile multi-étapes (`node:22-alpine` pour `npm run build` → `nginx:alpine`), `nginx.conf` avec `try_files $uri /index.html` pour les routes. Toujours compatible arm64 (Raspberry Pi 5).
 7. **Phase 2** : Web Worker pour le rendu, modèle `new-tool`, deuxième outil réel (détourage, redimensionnement…).
 
-## 7. Questions à trancher
+## 7. Décisions
 
-1. Survivre au F5 (IndexedDB) ou mémoire seule ?
-2. Quels outils suivants voulez-vous voir sur l'accueil (même en « bientôt ») ?
-3. Garder les polices Google (Bricolage / IBM Plex) ou passer aux polices système / auto-hébergées (utile hors ligne) ?
-4. Thème : garder le vert « tapis de coupe » comme couleur globale, ou un global neutre et le vert seulement pour la découpe (proposé dans les mockups) ?
+1. L'image survit au F5 : copie dans IndexedDB, liée à l'onglet (effacée à la fermeture).
+2. Seul l'outil réel (Découpe papier) est affiché ; les autres outils seront ajoutés quand ils existeront.
+3. Polices auto-hébergées (paquets `@fontsource`), aucun appel à Google Fonts.
+4. Global neutre ; le vert « tapis de coupe » est propre à la Découpe papier.
+5. Pas de carte « Ajouter un outil » sur l'accueil (documentation développeur uniquement, dans le README).
+6. « Continuer avec ce résultat » remplace l'image en cours puis propose la liste des outils ou l'accueil.
+7. Bouton « Télécharger l'image en cours » sur l'accueil et dans l'en-tête.

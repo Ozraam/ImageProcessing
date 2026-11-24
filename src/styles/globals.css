@@ -1,0 +1,132 @@
+@import "tailwindcss";
+@import "tw-animate-css";
+
+/* Polices auto-hébergées (copiées dans le build, aucun appel à Google Fonts) */
+@import "@fontsource-variable/bricolage-grotesque";
+@import "@fontsource/ibm-plex-sans/400.css";
+@import "@fontsource/ibm-plex-sans/500.css";
+@import "@fontsource/ibm-plex-sans/600.css";
+@import "@fontsource/ibm-plex-mono/400.css";
+@import "@fontsource/ibm-plex-mono/500.css";
+
+@custom-variant dark (&:is(.dark *));
+
+/*
+ * Thème global « atelier » : neutre. Chaque outil apporte sa propre couleur
+ * d'accent (voir ToolLayout), qui remplace --primary et --ring dans sa page.
+ */
+:root {
+  --radius: 0.625rem;
+  --background: #eceeea;
+  --foreground: #1b2420;
+  --card: #fbfcfa;
+  --card-foreground: #1b2420;
+  --popover: #ffffff;
+  --popover-foreground: #1b2420;
+  --primary: #1b2420;
+  --primary-foreground: #fbfcfa;
+  --secondary: #e4e8e5;
+  --secondary-foreground: #1b2420;
+  --muted: #e2e6e3;
+  --muted-foreground: #56645c;
+  --accent: #e4e8e5;
+  --accent-foreground: #1b2420;
+  --destructive: #b42318;
+  --border: #d3dad5;
+  --input: #d3dad5;
+  --ring: #1b2420;
+  --warn: #fff4dc;
+  --warn-foreground: #6b4a00;
+}
+
+.dark {
+  --background: #111614;
+  --foreground: #e4ebe7;
+  --card: #18201c;
+  --card-foreground: #e4ebe7;
+  --popover: #1c2520;
+  --popover-foreground: #e4ebe7;
+  --primary: #e4ebe7;
+  --primary-foreground: #111614;
+  --secondary: #232d28;
+  --secondary-foreground: #e4ebe7;
+  --muted: #2b3530;
+  --muted-foreground: #9aa9a1;
+  --accent: #232d28;
+  --accent-foreground: #e4ebe7;
+  --destructive: #f97066;
+  --border: #2b3530;
+  --input: #34403a;
+  --ring: #e4ebe7;
+  --warn: #3a2e12;
+  --warn-foreground: #f3d58c;
+}
+
+@theme inline {
+  --font-sans: "IBM Plex Sans", system-ui, -apple-system, sans-serif;
+  --font-display: "Bricolage Grotesque Variable", "Avenir Next", system-ui, sans-serif;
+  --font-mono: "IBM Plex Mono", ui-monospace, Menlo, monospace;
+
+  --radius-sm: calc(var(--radius) - 4px);
+  --radius-md: calc(var(--radius) - 2px);
+  --radius-lg: var(--radius);
+  --radius-xl: calc(var(--radius) + 4px);
+
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --color-card: var(--card);
+  --color-card-foreground: var(--card-foreground);
+  --color-popover: var(--popover);
+  --color-popover-foreground: var(--popover-foreground);
+  --color-primary: var(--primary);
+  --color-primary-foreground: var(--primary-foreground);
+  --color-secondary: var(--secondary);
+  --color-secondary-foreground: var(--secondary-foreground);
+  --color-muted: var(--muted);
+  --color-muted-foreground: var(--muted-foreground);
+  --color-accent: var(--accent);
+  --color-accent-foreground: var(--accent-foreground);
+  --color-destructive: var(--destructive);
+  --color-border: var(--border);
+  --color-input: var(--input);
+  --color-ring: var(--ring);
+  --color-warn: var(--warn);
+  --color-warn-foreground: var(--warn-foreground);
+}
+
+@layer base {
+  * {
+    @apply border-border outline-ring/50;
+  }
+  body {
+    @apply bg-background text-foreground font-sans antialiased;
+  }
+  h1, h2, h3 {
+    @apply font-display;
+  }
+}
+
+/* Motifs de zone d'aperçu réutilisables par les outils (ToolStage) */
+@utility stage-checker {
+  background-color: #ffffff;
+  background-image:
+    linear-gradient(45deg, #e3e6e3 25%, transparent 25%, transparent 75%, #e3e6e3 75%),
+    linear-gradient(45deg, #e3e6e3 25%, transparent 25%, transparent 75%, #e3e6e3 75%);
+  background-size: 16px 16px;
+  background-position: 0 0, 8px 8px;
+}
+
+/*
+ * Portée d'un outil : sa couleur d'accent devient la couleur principale
+ * (boutons, curseurs, cases, focus) pour tous les composants shadcn qu'il contient.
+ */
+.tool-scope {
+  --primary: var(--tool-accent-light);
+  --primary-foreground: #ffffff;
+  --ring: var(--tool-accent-light);
+}
+.dark .tool-scope {
+  --primary: var(--tool-accent-dark);
+  --primary-foreground: #0d1a14;
+  --ring: var(--tool-accent-dark);
+}
