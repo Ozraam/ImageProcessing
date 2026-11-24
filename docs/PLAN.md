@@ -44,7 +44,7 @@ src/
       ToolLayout.vue         # gabarit commun d'une page outil
       ToolControls.vue       # panneau de réglages (slots par section)
       ToolStage.vue          # zone d'aperçu (motif fourni par l'outil)
-      ToolExport.vue         # taille d'export, télécharger, « Envoyer vers… »
+      ToolExport.vue         # taille d'export, télécharger, « Continuer avec ce résultat »
       ToolCard.vue           # carte d'un outil sur l'accueil
   stores/
     image.ts                 # image en cours (voir §5)
@@ -124,7 +124,7 @@ actions: setSource(file), useResultAsSource(entry), clear()
 - Importée une fois (accueil, puce d'en-tête ou n'importe quel outil), l'image est **visible dans toutes les pages** ; chaque outil la reçoit à l'ouverture.
 - Comme l'app est une SPA, l'image reste en mémoire tant qu'on navigue dans le site.
 - **Rechargement de page (F5)** : l'image est aussi copiée dans IndexedDB (`sessionStorage` est limité à ~5 Mo, trop petit pour un PNG). Elle est effacée à la fermeture de l'onglet grâce à un identifiant de session gardé dans `sessionStorage`. → *à valider : voulez-vous survivre au F5, ou la mémoire seule suffit-elle ?*
-- **Chaîner les outils** : le bouton « Envoyer vers… » de la barre d'export remplace l'image en cours par le résultat et ouvre l'outil choisi.
+- **Chaîner les outils** : le bouton « Continuer avec ce résultat » de la barre d'export remplace l'image en cours par le résultat, puis propose la liste des autres outils ou le retour à l'accueil (jamais un outil imposé).
 - Les réglages de chaque outil sont aussi gardés dans le store (par outil), pour retrouver ses curseurs en revenant.
 - Les `ObjectURL` sont libérés (`URL.revokeObjectURL`) quand l'image est remplacée.
 
