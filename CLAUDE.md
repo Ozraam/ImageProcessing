@@ -1,6 +1,6 @@
 # CLAUDE.md
 
-Atelier d'image : site Vue 3 qui rassemble des utilitaires de traitement d'image (le premier : Découpe papier).
+Atelier d'image : site Vue 3 qui rassemble des utilitaires de traitement d'image (Recadrer & pivoter, Découpe papier ; les suivants sont décrits dans les issues GitHub).
 Tout le traitement se fait dans le navigateur ; aucune image n'est envoyée à un serveur.
 
 ## Commandes

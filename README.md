@@ -1,7 +1,9 @@
 # Atelier d'image
 
-Utilitaires de traitement d'image réunis sur une même page, à commencer par **Découpe papier**
-(un PNG détouré posé sur du papier froissé découpé aux ciseaux, avec son ombre).
+Utilitaires de traitement d'image réunis sur une même page :
+
+- **Recadrer & pivoter** : cadre aux proportions voulues, redressement fin, quarts de tour et miroirs ;
+- **Découpe papier** : un PNG détouré posé sur du papier froissé découpé aux ciseaux, avec son ombre.
 
 Tout le traitement se fait dans le navigateur : aucune image n'est envoyée au serveur.
 L'image importée est conservée d'une page à l'autre, et après un rafraîchissement, tant que l'onglet reste ouvert.
