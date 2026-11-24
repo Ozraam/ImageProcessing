@@ -96,6 +96,10 @@ l'entrée du menu « Outils » et la route `/outils/<id>` apparaissent toutes se
 Ce que le gabarit apporte à chaque outil : l'en-tête, le panneau de réglages en sections repliables,
 la zone de dépôt quand aucune image n'est chargée, la barre d'export (« Télécharger » et
 « Continuer avec ce résultat », qui fait du résultat l'image en cours puis propose les autres outils).
+Un calcul lourd a intérêt à tourner dans un Web Worker pour ne pas figer la page :
+voir `src/tools/decoupe-papier/` (`worker.ts` pour le calcul, `renderer.ts` côté page, avec repli
+sur le thread principal quand le navigateur ne connaît pas `OffscreenCanvas`).
+
 Ce qui reste propre à l'outil : sa couleur d'accent (appliquée à tous les boutons, curseurs et
 interrupteurs de sa page), le motif de sa zone d'aperçu et ses interactions.
 

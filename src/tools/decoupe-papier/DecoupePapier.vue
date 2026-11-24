@@ -14,10 +14,11 @@ import ToolSlider from '@/components/tool/ToolSlider.vue'
 import ToolStage from '@/components/tool/ToolStage.vue'
 import ToolExport from '@/components/tool/ToolExport.vue'
 import { useToolSettings } from '@/composables/useToolSettings'
-import { baseName, canvasToBlob, decodeImage } from '@/lib/image'
+import { baseName, canvasToBlob } from '@/lib/image'
 import { useImageStore } from '@/stores/image'
 import tool from './tool'
-import { applyCrop, cropPx, defaultParams, fitRatio, render, sampleFlower, type Crop, type DecoupeParams } from './render'
+import { applyCrop, cropPx, defaultParams, fitRatio, sampleFlower, type Crop, type DecoupeParams } from './render'
+import { DecoupeRenderer, type PreviewResult } from './renderer'
 
 const PREVIEW_SIZE = 760
 
@@ -28,50 +29,43 @@ const params = computed<DecoupeParams>(() => {
   return p
 })
 
+// Le calcul se fait dans un Web Worker (repli sur la page si le navigateur ne le permet pas)
+const renderer = new DecoupeRenderer()
+
 /* ---------- image source et fond ---------- */
-const src = shallowRef<ImageBitmap | null>(null)
 const crop = ref<Crop | null>(null)
 const cropMode = ref(false)
-const bgImg = shallowRef<ImageBitmap | null>(null)
+const hasBg = ref(false)
+const bgVersion = ref(0)
 
 watch(
   () => store.current?.id,
-  async () => {
-    const blob = store.current?.blob
-    src.value?.close()
-    src.value = null
+  () => {
+    renderer.setSource(store.current?.blob ?? null)
+    setLastFull(null)
     crop.value = null
     cropMode.value = false
     settings.value.ratio = 'free'
-    if (!blob) return
-    try {
-      src.value = await decodeImage(blob)
-    } catch {
-      toast.error('Impossible de lire cette image.')
-    }
   },
   { immediate: true },
 )
 
 const bgDialog = useFileDialog({ accept: 'image/*', multiple: false, reset: true })
-bgDialog.onChange(async files => {
+bgDialog.onChange(files => {
   const f = files?.[0]
   if (!f) return
-  try {
-    bgImg.value?.close()
-    bgImg.value = await decodeImage(f)
-  } catch {
-    toast.error('Impossible de lire cette image de fond.')
-  }
+  renderer.setBackground(f)
+  hasBg.value = true
+  bgVersion.value++
 })
 
 onBeforeUnmount(() => {
-  src.value?.close()
-  bgImg.value?.close()
+  renderer.dispose()
+  setLastFull(null)
 })
 
 async function useSample() {
-  const blob = await canvasToBlob(sampleFlower())
+  const blob = await canvasToBlob(sampleFlower() as HTMLCanvasElement)
   await store.importFile(new File([blob], 'exemple-fleur.png', { type: 'image/png' }))
 }
 
@@ -79,22 +73,32 @@ async function useSample() {
 const view = ref<HTMLCanvasElement | null>(null)
 const busy = ref(false)
 const timing = ref('')
-const lastFull = shallowRef<HTMLCanvasElement | null>(null)
+const lastFull = shallowRef<PreviewResult['image'] | null>(null)
+
+function setLastFull(img: PreviewResult['image'] | null) {
+  if (lastFull.value && 'close' in lastFull.value) lastFull.value.close()
+  lastFull.value = img
+}
 
 const ratioVal = computed(() => (settings.value.ratio === 'free' ? 0 : parseFloat(settings.value.ratio)))
 
-function preview() {
-  if (!src.value) return
-  const t0 = performance.now()
-  lastFull.value = render(src.value, params.value, PREVIEW_SIZE, bgImg.value)
-  if (crop.value && ratioVal.value) crop.value = fitRatio(crop.value, ratioVal.value, lastFull.value.width, lastFull.value.height)
-  draw()
+async function preview() {
+  if (!store.current) return
+  try {
+    const r = await renderer.preview(params.value, PREVIEW_SIZE)
+    if (!r) return // une demande plus récente est en cours
+    setLastFull(r.image)
+    if (crop.value && ratioVal.value) crop.value = fitRatio(crop.value, ratioVal.value, r.image.width, r.image.height)
+    draw()
+    timing.value = `aperçu ${Math.round(r.ms)} ms`
+  } catch {
+    toast.error("Impossible de calculer l'aperçu de cette image.")
+  }
   busy.value = false
-  timing.value = `aperçu ${Math.round(performance.now() - t0)} ms`
 }
 const schedulePreview = useDebounceFn(preview, 90)
-watch([params, src, bgImg], () => {
-  if (!src.value) return
+watch([params, () => store.current?.id, bgVersion], () => {
+  if (!store.current) return
   busy.value = true
   schedulePreview()
 }, { deep: true, immediate: true })
@@ -129,7 +133,7 @@ function draw() {
 useEventListener(window, 'resize', () => { if (cropMode.value) draw() })
 
 const dims = computed(() => {
-  const full = lastFull.value, s = src.value
+  const full = lastFull.value, s = store.current
   if (!full || !s) return '—'
   const scale = Math.min(1, PREVIEW_SIZE / Math.max(s.width, s.height))
   const fw = full.width / scale, fh = full.height / scale
@@ -215,10 +219,8 @@ const onPointerUp = () => { drag = null }
 
 /* ---------- export ---------- */
 const filename = computed(() => `${baseName(store.current?.name ?? 'decoupe')}-papier.png`)
-async function renderFinal() {
-  if (!src.value) throw new Error('Aucune image')
-  const out = applyCrop(render(src.value, params.value, parseInt(settings.value.outsize, 10), bgImg.value), crop.value)
-  return canvasToBlob(out)
+function renderFinal() {
+  return renderer.export(params.value, parseInt(settings.value.outsize, 10), crop.value)
 }
 
 function reseed() {
@@ -300,7 +302,7 @@ const pct = (v: number) => `${String(v).replace('.', ',')} %`
             class="h-9 w-11 rounded-md border bg-background p-0.5 cursor-pointer"
           />
           <Button v-if="settings.bgmode === 'image'" variant="outline" @click="bgDialog.open()">
-            {{ bgImg ? 'Changer l\'image…' : 'Image de fond…' }}
+            {{ hasBg ? 'Changer l\'image…' : 'Image de fond…' }}
           </Button>
         </div>
         <ToolSlider v-model="settings.margin" label="Marge autour" :max="40" :format="pct" />
@@ -324,7 +326,7 @@ const pct = (v: number) => `${String(v).replace('.', ',')} %`
     </template>
 
     <template #export>
-      <ToolExport :tool="tool" :filename="filename" :render="renderFinal" :disabled="!src">
+      <ToolExport :tool="tool" :filename="filename" :render="renderFinal" :disabled="!lastFull">
         <div class="flex items-center justify-between gap-2">
           <Label for="outsize" class="font-normal">Taille d'export</Label>
           <Select v-model="settings.outsize">

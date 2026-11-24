@@ -1,10 +1,20 @@
 /**
  * Rendu « découpé dans du papier froissé ».
  * Algorithme repris tel quel de l'ancienne page index.html, sans dépendance à l'interface.
+ * Fonctionne dans un Web Worker (OffscreenCanvas) comme sur le thread principal (<canvas>).
  */
-import { createCanvas as mk } from '@/lib/image'
 
 export type Source = CanvasImageSource & { width: number; height: number }
+export type Canvas = HTMLCanvasElement | OffscreenCanvas
+type Ctx = CanvasRenderingContext2D | OffscreenCanvasRenderingContext2D
+
+/** Crée une surface de dessin : OffscreenCanvas dans un worker, <canvas> sinon. */
+function mk(w: number, h: number): Canvas {
+  w = Math.max(1, Math.round(w)); h = Math.max(1, Math.round(h))
+  if (typeof document === 'undefined') return new OffscreenCanvas(w, h)
+  const c = document.createElement('canvas'); c.width = w; c.height = h
+  return c
+}
 
 export interface DecoupeParams {
   cut: 'round' | 'straight'
@@ -126,10 +136,10 @@ function boxBlurAlpha(data: Uint8ClampedArray, W: number, H: number, r: number) 
   for (let i = 0; i < W * H; i++) data[i * 4 + 3] = a[i]!
 }
 
-const ctx2d = (c: HTMLCanvasElement) => c.getContext('2d', { willReadFrequently: true })!
+const ctx2d = (c: Canvas) => c.getContext('2d', { willReadFrequently: true }) as Ctx
 
 /* ---------- rendu ---------- */
-export function render(src: Source, p: DecoupeParams, targetL: number, bgImg: Source | null = null): HTMLCanvasElement {
+export function render(src: Source, p: DecoupeParams, targetL: number, bgImg: Source | null = null): Canvas {
   const seed = p.seed
   const sL = Math.max(src.width, src.height), s = Math.min(1, targetL / sL)
   const iw = Math.max(1, Math.round(src.width * s)), ih = Math.max(1, Math.round(src.height * s))
@@ -331,7 +341,7 @@ function simplifyClosed(pts: Pt[], tol: number): Pt[] {
   return a.concat(b.slice(1, -1))
 }
 
-function drawWall(ctx: CanvasRenderingContext2D, W: number, H: number, c: [number, number, number], L: number, seed: number) {
+function drawWall(ctx: Ctx, W: number, H: number, c: [number, number, number], L: number, seed: number) {
   const q = Math.max(1, Math.round(Math.max(W, H) / 500)), w = Math.ceil(W / q), h = Math.ceil(H / q)
   const t = mk(w, h), tx = ctx2d(t), d = tx.createImageData(w, h), p = d.data
   for (let y = 0; y < h; y++) for (let x = 0; x < w; x++) {
@@ -356,7 +366,7 @@ export function cropPx(c: Crop, W: number, H: number): [number, number, number, 
   return [x, y, Math.max(1, Math.min(W - x, Math.round(c.w * W))), Math.max(1, Math.min(H - y, Math.round(c.h * H)))]
 }
 
-export function applyCrop(cv: HTMLCanvasElement, crop: Crop | null): HTMLCanvasElement {
+export function applyCrop<T extends Source>(cv: T, crop: Crop | null): T | Canvas {
   if (!crop) return cv
   const [x, y, w, h] = cropPx(crop, cv.width, cv.height), o = mk(w, h)
   ctx2d(o).drawImage(cv, x, y, w, h, 0, 0, w, h)
@@ -375,7 +385,7 @@ export function fitRatio(crop: Crop | null, r: number, W: number, H: number): Cr
 }
 
 /* ---------- exemple : une fleur dessinée ---------- */
-export function sampleFlower(): HTMLCanvasElement {
+export function sampleFlower(): Canvas {
   const c = mk(900, 1000), x = ctx2d(c)
   x.lineCap = 'round'
   x.strokeStyle = '#3f8a3a'; x.lineWidth = 26

@@ -1,6 +1,6 @@
 # Plan — Migration vers Vue 3 + shadcn-vue
 
-> Statut : **validé et mis en œuvre** (étapes 1 à 6). Reste la phase 2 (§6, étape 7).
+> Statut : **validé et mis en œuvre** (étapes 1 à 6, et le Web Worker de la phase 2).
 > Mockups modifiables : https://claude.ai/artifact/VAv4o6VWThBVj5KmiWw2m3
 
 ## 1. Objectifs
