@@ -1,7 +1,7 @@
 services:
-  decoupe-papier:
+  atelier:
     build: .
-    image: decoupe-papier:latest
+    image: atelier:latest
     container_name: decoupe-papier
     ports:
       - "8090:80"
