@@ -1,4 +1,9 @@
 <!-- Vignette de la carte d'accueil : le tapis de coupe et un morceau de papier -->
+<script setup lang="ts">
+// Motif du tapis de coupe, partagé avec la page de l'outil (chargée à la demande)
+import './decoupe.css'
+</script>
+
 <template>
   <div class="decoupe-mat grid place-items-center">
     <div class="w-[74px] h-[84px] bg-[#f6f6f1] rounded-[40%_46%_38%_44%] shadow-[6px_10px_14px_rgba(0,0,0,.35)] grid place-items-center">
