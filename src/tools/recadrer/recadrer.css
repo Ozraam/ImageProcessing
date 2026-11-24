@@ -1,0 +1,11 @@
+/* Motif propre à cet outil : une table lumineuse sombre, pointillée.
+   Importé par la page et par la vignette de l'accueil. */
+.recadrer-table {
+  background-color: #2b2f3a;
+  background-image: radial-gradient(rgba(255, 255, 255, 0.11) 1px, transparent 1.4px);
+  background-size: 18px 18px;
+}
+.dark .recadrer-table {
+  background-color: #1c1f27;
+  background-image: radial-gradient(rgba(255, 255, 255, 0.08) 1px, transparent 1.4px);
+}

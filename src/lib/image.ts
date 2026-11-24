@@ -37,9 +37,9 @@ export async function analyzeImage(blob: Blob): Promise<ImageInfo> {
   }
 }
 
-export function canvasToBlob(canvas: HTMLCanvasElement, type = 'image/png'): Promise<Blob> {
+export function canvasToBlob(canvas: HTMLCanvasElement, type = 'image/png', quality?: number): Promise<Blob> {
   return new Promise((resolve, reject) => {
-    canvas.toBlob(b => (b ? resolve(b) : reject(new Error('Conversion impossible'))), type)
+    canvas.toBlob(b => (b ? resolve(b) : reject(new Error('Conversion impossible'))), type, quality)
   })
 }
 

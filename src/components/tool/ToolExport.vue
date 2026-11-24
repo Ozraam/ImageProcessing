@@ -54,7 +54,7 @@ async function download() {
   const blob = await produce()
   if (!blob) return
   downloadBlob(blob, props.filename)
-  toast.success('PNG téléchargé')
+  toast.success('Image téléchargée')
 }
 
 async function continueTo(path: string) {
