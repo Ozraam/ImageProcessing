@@ -3,6 +3,10 @@
 Utilitaires de traitement d'image réunis sur une même page :
 
 - **Recadrer & pivoter** : cadre aux proportions voulues, redressement fin, quarts de tour et miroirs ;
+- **Redimensionner** : taille en pixels ou en pourcentage, préréglages (avatar, bannière, Full HD, A4/A5 à 300 dpi),
+  réduction par paliers et mode « pixels nets » pour le pixel art ;
+- **Convertir & compresser** : PNG, JPEG, WebP (AVIF si le navigateur le permet), qualité avec poids recalculé
+  en direct, comparaison avant/après avec loupe, métadonnées retirées ;
 - **Découpe papier** : un PNG détouré posé sur du papier froissé découpé aux ciseaux, avec son ombre.
 
 Tout le traitement se fait dans le navigateur : aucune image n'est envoyée au serveur.
@@ -100,7 +104,9 @@ la zone de dépôt quand aucune image n'est chargée, la barre d'export (« Tél
 « Continuer avec ce résultat », qui fait du résultat l'image en cours puis propose les autres outils).
 Un calcul lourd a intérêt à tourner dans un Web Worker pour ne pas figer la page :
 voir `src/tools/decoupe-papier/` (`worker.ts` pour le calcul, `renderer.ts` côté page, avec repli
-sur le thread principal quand le navigateur ne connaît pas `OffscreenCanvas`).
+sur le thread principal quand le navigateur ne connaît pas `OffscreenCanvas`). Pour un calcul simple
+« une demande → un fichier », `src/lib/task-worker.ts` fait tout cela en quelques lignes : voir
+`src/tools/redimensionner/` ou `src/tools/convertir/`.
 
 Ce qui reste propre à l'outil : sa couleur d'accent (appliquée à tous les boutons, curseurs et
 interrupteurs de sa page), le motif de sa zone d'aperçu et ses interactions.

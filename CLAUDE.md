@@ -1,6 +1,6 @@
 # CLAUDE.md
 
-Atelier d'image : site Vue 3 qui rassemble des utilitaires de traitement d'image (Recadrer & pivoter, Découpe papier ; les suivants sont décrits dans les issues GitHub).
+Atelier d'image : site Vue 3 qui rassemble des utilitaires de traitement d'image (Recadrer & pivoter, Redimensionner, Convertir & compresser, Découpe papier ; les suivants sont décrits dans les issues GitHub).
 Tout le traitement se fait dans le navigateur ; aucune image n'est envoyée à un serveur.
 
 ## Commandes
@@ -30,6 +30,8 @@ src/
   components/shell/   AppHeader, CurrentImageChip, ImageDropzone, ToolCard
   components/tool/    gabarit commun : ToolLayout, ToolSection, ToolSlider, ToolStage, ToolExport
   composables/        useToolSettings (réglages par outil, sessionStorage), useImagePicker
+  lib/canvas.ts       canvas page/worker (newCanvas, encodeCanvas, lastBitmap)
+  lib/task-worker.ts  serveTasks (worker) + TaskClient (page, repli, « dernière demande seulement »)
   stores/image.ts     image en cours + images de la session
   tools/<id>/         un dossier par utilitaire, découvert automatiquement
   tools/registry.ts   import.meta.glob('./*/tool.ts') → accueil, menu, routes
@@ -51,7 +53,9 @@ Rien d'autre à modifier : la carte, le menu et la route `/outils/<id>` sont gé
   donc les composants shadcn prennent la couleur de l'outil sans rien faire. Le motif d'aperçu passe par `class` sur
   `<ToolStage>` (le vert « tapis de coupe » est propre à la Découpe ; le thème global reste neutre).
 - Calcul lourd : le faire dans un Web Worker, sur le modèle de `tools/decoupe-papier/`
-  (`render.ts` pur et compatible OffscreenCanvas, `worker.ts`, `protocol.ts`, `renderer.ts` avec repli sur la page).
+  (`render.ts` pur et compatible OffscreenCanvas, `worker.ts`, `protocol.ts`, `renderer.ts` avec repli sur la page),
+  ou, pour une demande qui produit un fichier, avec `lib/task-worker.ts` (modèle : `tools/redimensionner/`).
+  Le `new Worker(new URL('./worker.ts', import.meta.url), …)` doit rester écrit dans l'outil pour que Vite le trouve.
 
 ## Règles du produit (décidées avec l'utilisateur)
 
