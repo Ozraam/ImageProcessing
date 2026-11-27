@@ -1,0 +1,24 @@
+/* Motif propre à cet outil : du papier millimétré.
+   Importé par la page et par la vignette de l'accueil. */
+.redim-papier {
+  --redim-paper: #f7f1e6;
+  --redim-fine: rgba(176, 80, 28, 0.09);
+  --redim-bold: rgba(176, 80, 28, 0.2);
+  background-color: var(--redim-paper);
+  background-image:
+    linear-gradient(var(--redim-bold) 1px, transparent 1px),
+    linear-gradient(90deg, var(--redim-bold) 1px, transparent 1px),
+    linear-gradient(var(--redim-fine) 1px, transparent 1px),
+    linear-gradient(90deg, var(--redim-fine) 1px, transparent 1px);
+  background-size: 50px 50px, 50px 50px, 10px 10px, 10px 10px;
+  background-position: -1px -1px;
+}
+.dark .redim-papier {
+  --redim-paper: #2a231d;
+  --redim-fine: rgba(240, 163, 106, 0.07);
+  --redim-bold: rgba(240, 163, 106, 0.16);
+}
+/* aperçu en taille réelle : les pixels restent carrés en mode net */
+.redim-pixelated {
+  image-rendering: pixelated;
+}
