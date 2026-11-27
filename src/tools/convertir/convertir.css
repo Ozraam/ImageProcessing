@@ -1,0 +1,16 @@
+/* Motif propre à cet outil : un damier prune, pour voir la transparence.
+   Importé par la page et par la vignette de l'accueil. */
+.convertir-damier {
+  --cv-a: #f6f1f7;
+  --cv-b: #e8dcec;
+  background-color: var(--cv-a);
+  background-image:
+    linear-gradient(45deg, var(--cv-b) 25%, transparent 25%, transparent 75%, var(--cv-b) 75%),
+    linear-gradient(45deg, var(--cv-b) 25%, transparent 25%, transparent 75%, var(--cv-b) 75%);
+  background-size: 20px 20px;
+  background-position: 0 0, 10px 10px;
+}
+.dark .convertir-damier {
+  --cv-a: #2a2230;
+  --cv-b: #332939;
+}
